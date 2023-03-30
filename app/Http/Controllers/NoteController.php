@@ -12,12 +12,39 @@ class NoteController extends Controller
 
     public function index(Request $request)
     {
+        $sort = $request->input('sort');
         $notes = Note::where('user_id', Auth::id())
             ->when($request->input('search'), function ($query, $search) {
                 return $query->where('title', 'LIKE', "%{$search}%")
                     ->orWhere('body', 'LIKE', "%{$search}%");
             })
-            ->orderBy('created_at', 'desc')
+            ->when($request->input('sort'), function ($query, $sort) {
+                switch ($sort) {
+                    case 'title_asc':
+                        $query->orderBy('title');
+                        break;
+                    case 'title_desc':
+                        $query->orderBy('title', 'desc');
+                        break;
+                    case 'created_at_asc':
+                        $query->orderBy('created_at');
+                        break;
+                    case 'created_at_desc':
+                        $query->orderBy('created_at', 'desc');
+                        break;
+                    case 'updated_at_asc':
+                        $query->orderBy('updated_at');
+                        break;
+                    case 'updated_at_desc':
+                        $query->orderBy('updated_at', 'desc');
+                        break;
+                    case 'important':
+                        $query->where('important', true);
+                        break;
+                    default:
+                        break;
+                }
+            })
             ->paginate(8);
 
         $noteCount = count($notes);
@@ -26,7 +53,7 @@ class NoteController extends Controller
 
         $categories = Category::where('user_id', Auth::id())->get();
 
-        return view('notes', ['heading' => $heading, "message" => $message], compact('notes', 'noteCount', 'categories'));
+        return view('notes', ['heading' => $heading, "message" => $message], compact('notes', 'noteCount', 'categories', 'sort'));
     }
 
     public function create()
@@ -61,7 +88,6 @@ class NoteController extends Controller
     {
 
         $categories = Category::where('user_id', Auth::id())->get();
-
         return view('notes.edit', ['heading' => 'Edit your note'], compact('note', 'categories'));
     }
 

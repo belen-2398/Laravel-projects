@@ -12,8 +12,8 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $categories = Category::where('user_id', Auth::id())
-                    ->when($request->input('search'), function ($query, $search) {
-                        return $query->where('name', 'LIKE', "%{$search}%");
+            ->when($request->input('search'), function ($query, $search) {
+                return $query->where('name', 'LIKE', "%{$search}%");
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -62,11 +62,39 @@ class CategoryController extends Controller
             ->with('success', 'Category created successfully.');
     }
 
-    public function show(Category $category)
+    public function show(Category $category, Request $request)
     {
-        $categories = Category::where('user_id', Auth::id());
-
-        return view('categories.show', ['heading' => $category->name], compact('category', 'categories'));
+        $sort = $request->input('sort');
+        $notes = Note::where('category_id', $category->id)
+            ->when($request->input('sort'), function ($query, $sort) {
+                switch ($sort) {
+                    case 'title_asc':
+                        $query->orderBy('title');
+                        break;
+                    case 'title_desc':
+                        $query->orderBy('title', 'desc');
+                        break;
+                    case 'created_at_asc':
+                        $query->orderBy('created_at');
+                        break;
+                    case 'created_at_desc':
+                        $query->orderBy('created_at', 'desc');
+                        break;
+                    case 'updated_at_asc':
+                        $query->orderBy('updated_at');
+                        break;
+                    case 'updated_at_desc':
+                        $query->orderBy('updated_at', 'desc');
+                        break;
+                    case 'important':
+                        $query->where('important', true);
+                        break;
+                    default:
+                        break;
+                }
+            })
+            ->paginate(8);
+        return view('categories.show', ['heading' => $category->name], compact('notes', 'category', 'sort'));
     }
 
     public function edit(Category $category)

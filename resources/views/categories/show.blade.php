@@ -8,14 +8,17 @@
         @if ($category->notes->isEmpty())
             <p>There are no notes in this category yet.</p>
         @else
+        <form action="{{ route('categories.show', $category) }}" method="GET">
+          @include('partials.sort')
             <div class="grid grid-cols-4 gap-4 pr-6"> 
-                @foreach ($category->notes as $index => $note)
+                @foreach ($notes as $index => $note)
                     @include('partials.noteAspect')
                 @endforeach
+
             </div>
-            <div class="mt-12">
-                <form action="{{ route('categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this note?')">
-                    <a href="{{ route("categories.edit", $category->id) }}" class="text-white inline-block font-semibold hover:underline rounded px-4 py-3 sm:px-6 bg-purple-800 m-2 ml-6">Edit category</a>
+            <div class="mt-16">
+                <form action="{{ route('categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this category?')">
+                    <a href="{{ route("categories.edit", $category) }}" class="text-white inline-block font-semibold hover:underline rounded px-4 py-3 sm:px-6 bg-purple-800 m-2 ml-6">Edit category</a>
                     @csrf
                     @method('DELETE')
                     <button type="submit" class= "text-white inline-block font-semibold hover:underline rounded px-4 py-3 sm:px-6 bg-red-800">Delete category</button>
@@ -26,7 +29,7 @@
 
 <div class="w-1/4">
   <div class="m-6 ml-auto w-52 flex justify-end">
-    <form action="{{ route('notes.index', ['category' => $category->id]) }}" method="GET">
+    <form action="{{ route('notes.index', $category) }}" method="GET">
       <div class="flex">
         <input type="text" name="search" placeholder="Search notes" class="rounded-md px-3 py-2 focus:ring-yellow-600 focus:border-yellow-600 flex-1 block w-full sm:text-sm border-gray-300">
         <button type="submit" class="text-black block font-bold rounded-md px-3 py-2 text-base hover:bg-yellow-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-600">
@@ -39,10 +42,6 @@
     </form>   
   </div>
 </div>
-
-    <div class="absolute bottom-0 left-0">
-        <p><a href="/categories" class="text-blue-500 hover:underline m-6">Go back</a></p>
-    </div>
 </main>
 
 @include('partials.foot')

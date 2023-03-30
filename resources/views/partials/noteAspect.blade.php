@@ -1,6 +1,6 @@
 <div class="bg-{{ noteBgColor($index) }}-200 rounded-lg shadow-md p-6 hover:bg-{{ noteBgColor($index) }}-300 h-4/4 w-4/4 relative">
     {{-- star --}}
-    <form action="{{ route('notes.toggleImportant', ['note' => $note->id]) }}" method="POST" class="absolute top-0 right-0 mt-2 mr-2">
+    <form action="{{ route('notes.toggleImportant', $note) }}" method="POST" class="absolute top-0 right-0 mt-2 mr-2">
         @csrf
         @method('PUT')
         <button type="submit">
@@ -10,8 +10,14 @@
         </button>
     </form>
 
-    <a href="{{ route('notes.show', ['note' => $note->id]) }}" class="text-blue-800 hover:underline mb-2 block"> 
+    <p class="absolute top-0 left-1 mt-2 ml-2 text-gray-600"> {{ $note->updated_at->format('d M') }} </p>  
+
+    <a href="{{ route('notes.show', $note) }}" class="text-blue-800 hover:underline mb-2 block"> 
         <h3 class="text-lg font-semibold mt-2">{{ htmlspecialchars($note->title) }}</h3>
     </a>
     <p class="m-2">{{ Str::limit($note->body, 50, '...') }}</p>
+    
+    <div class="pt-12 p-4">
+            @if ($note->category)<p class= "absolute bottom-2 left-4 right-2 text-gray-600"> Cat.: "{{ $note->category->name }}". </p>@endif
+    </div> 
 </div>

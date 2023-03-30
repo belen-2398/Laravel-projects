@@ -5,6 +5,9 @@
 <main class="flex">
     <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
         @if (empty($message)) @endif
+
+        <form action="{{ route('notes.index') }}" method="GET">
+        @include('partials.sort')
         <div class="grid grid-cols-4 gap-4 pr-6"> 
             @foreach ($notes as $index => $note)
             @include('partials.noteAspect')
